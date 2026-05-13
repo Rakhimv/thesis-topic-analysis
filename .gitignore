@@ -1,3 +1,4 @@
 *.xlsx
 
 .vs/
+.vscode/
