@@ -1,7 +1,4 @@
 import pandas as pd
-from collections import Counter
-
-data = pd.read_excel("thesis_data.xlsx")
 
 categories = {
     "Машинное обучение": ["машинн", "нейросет", "классификац", "обучен", "глубок", "deep", "ml", "ai", "нейронных", "рекомендательн"],
@@ -24,41 +21,43 @@ categories = {
     "Медицина": ["головного мозга", "реактивным артритом", "медицин", "больных"],
 }
 
+department_mapping = {
+    'tp': 'Кафедра технологии программирования',
+    'vmmdt': 'Кафедра вычислительных методов механики деформируемого тела',
+    'kmms': 'Кафедра компьютерного моделирования и многопроцессорных систем',
+    'tsuefa': 'Кафедра теории систем управления электрофизической аппаратурой',
+    'mstnmo': 'Кафедра математического моделирования энергетических систем',
+    'mems': 'Кафедра моделирования электромеханических и компьютерных систем',
+    'kts': 'Кафедра компьютерных технологий и систем',
+    'tu': 'Кафедра теории управления',
+    'mud': 'Кафедра механики управляемого движения',
+    'mes': 'Кафедра математического моделирования энергетических систем',
+    'mses': 'Кафедра моделирования социально-экономических систем',
+    'vm': 'Кафедра вычислительной математики',
+    'is': 'Кафедра информационных систем',
+    'ktpa': 'Кафедра космических технологий и прикладной астродинамики',
+    'mtmpsu': 'Кафедра математической теории микропроцессорных систем управления',
+    'mtmsu': 'Кафедра математической теории моделирования систем управления',
+    'umbs': 'Кафедра управления медико-биологическими системами',
+    'dfs': 'Кафедра диагностики функциональных систем',
+    'mmes': 'Кафедра моделирования экономических систем',
+    'mter': 'Кафедра математической теории экономических решений',
+}
+
+
 def get_category(title):
     title_lower = title.lower()
     for category, keywords in categories.items():
         if any(kw in title_lower for kw in keywords):
             return category
-    return "Прочее"                
+    return "Прочее"
 
 def apply_categories(data):
     data["category"] = data["Title_ru"].apply(get_category)
     return data
 
-print(apply_categories(data).value_counts())
-
-
-
-
-
-
-stop_words = ["для", "на", "по", "в", "с", "и", "к", "о", "из", "при", "за", "от", "не", "до", "об"]
-bigrams = []
-for title in data[data["category"] == "Прочее"]["Title_ru"].dropna():
-    words = [w for w in title.lower().split() if len(w) > 3]
-    for i in range(len(words) - 1):
-        bigrams.append(f"{words[i]} {words[i+1]}")
-
-print("\n\n****** топ словосочетаний ******\n")
-print(Counter(bigrams).most_common(20))
-
-
-
-words = []
-for title in data[data["category"] == "Прочее"]["Title_ru"].dropna():
-    for word in title.lower().split():
-        if word not in stop_words and len(word) > 3:
-            words.append(word)
-
-print("\n\n****** топ слов ******\n")      
-print(Counter(words).most_common(20))
+def expand_department_name(dept):
+    if pd.isna(dept):
+        return None
+    code = str(dept).strip()
+    return department_mapping.get(code, code)
