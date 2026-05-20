@@ -3,22 +3,24 @@ import matplotlib.pyplot as plt
 
 data = pd.read_excel("thesis_data.xlsx")
 
-data['Advisor'] = data['Advisor'].astype(str).str.strip()
-data['Advisor_clean'] = data['Advisor'].replace(['nan', 'None', ''], pd.NA)
+data['Advisor'] = data['Advisor'].astype(str).str.strip() #берём колонки, на строки бъём, удаляем пробелы
+data['Advisor_clean'] = data['Advisor'].replace(['nan', 'None', ''], pd.NA) #создаём колонку, которая заменяет пустые на NA(нет данных)
 
-advisor_counts = data['Advisor_clean'].value_counts().dropna()
+advisor_counts = data['Advisor_clean'].value_counts().dropna() #считаем и удаляем с маркером NA
 
-top_10 = advisor_counts.head(10)
+top_10 = advisor_counts.head(10) #берём первые 10 
 
 plt.figure(figsize=(12, 8))
-plt.barh(range(len(top_10)), top_10.values, color='steelblue')
-plt.yticks(range(len(top_10)), top_10.index)
-plt.xlabel('Количество работ')
-plt.title('Топ-10 преподавателей по количеству работ')
-plt.gca().invert_yaxis()
+plt.barh(range(len(top_10)), top_10.values, color='steelblue') #строим горизонтальные графики
+plt.yticks(range(len(top_10)), top_10.index) #подписываем имена преподавателей
+plt.xlabel('Количество работ') #подпись оси x
+plt.title('Топ-10 преподавателей по количеству работ') #Заголовок
+plt.gca().invert_yaxis() #самый частый - сверху
 
+#v + 0.3 — позиция по X 
+#i — позиция по Y 
 for i, v in enumerate(top_10.values):
     plt.text(v + 0.3, i, str(v), va='center')
 
-plt.tight_layout()
-plt.show()
+plt.tight_layout() #настраивает отступы
+plt.show() #запуск
