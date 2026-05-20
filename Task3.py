@@ -7,7 +7,7 @@ import os
 
 data = pd.read_excel("thesis_data.xlsx")
 
-from categories import get_category, apply_categories, expand_department_name, department_mapping, speciality_mapping
+from categories import expand_department_name, department_mapping, speciality_mapping
 
 # Пытаемся найти совпадения из словаря
 def normalize_speciality(spec): 
