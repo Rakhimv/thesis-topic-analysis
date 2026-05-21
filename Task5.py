@@ -9,3 +9,9 @@ pivot = pd.crosstab(data["Department"], data["category"])
 
 fig = px.imshow(pivot, title="Связь кафедр и тематик", aspect="auto", color_continuous_scale="Blues")
 fig.show()
+
+
+
+
+
+
