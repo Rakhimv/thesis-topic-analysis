@@ -66,7 +66,17 @@ fig.update_layout(
     margin=dict(l=220, r=80, t=80, b=40),
 )
 fig.update_xaxes(title_text="Количество")
-
+fig.update_yaxes(
+    tickmode='array',
+    tickvals=total["category"],
+    automargin=True,
+    row=1, col=1
+)
+fig.update_layout(
+    height=2200,  
+    width=1400,
+    autosize=False,
+)
 fig.write_html("thesis_plots.html", auto_open=False)
 fig.show()
 print("thesis_plots.html")
