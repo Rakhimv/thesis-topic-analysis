@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>thesis advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1c1c1e url("/bg.png") center center / cover no-repeat fixed;
+    color: #f5f5f5;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+    padding: 40px 48px;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; position: relative; z-index: 1; }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .tab {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    background: transparent;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .tab:hover { background: rgba(255,255,255,.12); }
+  .tab.active {
+    background: #fff;
+    color: #111;
+    border-color: #fff;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .search, .select-advisor {
+    width: 100%;
+    background: #fff;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 17px;
+    padding: 14px 18px;
+    outline: none;
+    color: #111;
+  }
+  .select-advisor option { background: #fff; color: #111; }
+  .search::placeholder { color: #666; }
+  .search:focus, .select-advisor:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.45);
+  }
+
+  .list { margin-top: 28px; display: flex; flex-direction: column; gap: 16px; }
+
+  .item {
+    background: #ffffff;
+    border: 2px solid #fff;
+    border-radius: 12px;
+    padding: 20px 22px 18px;
+    color: #111;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 8px;
+  }
+
+  .meta {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 12px;
+  }
+  .meta span::after { content: " · "; color: #999; }
+  .meta span:last-child::after { content: ""; }
+
+  .matches, .works-full {
+    margin-bottom: 14px;
+    padding-left: 0;
+    list-style: none;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+  .matches li, .works-full li {
+    font-size: 14px;
+    color: #1a1a1a;
+    line-height: 1.5;
+    padding: 8px 0 8px 14px;
+    border-left: 4px solid #2563eb;
+    margin-bottom: 8px;
+    background: #f8f8f8;
+    border-radius: 0 6px 6px 0;
+    padding-right: 10px;
+  }
+  .works-full li .work-cat {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d4ed8;
+    margin-top: 4px;
+  }
+
+  .bar-row { display: flex; align-items: center; gap: 14px; }
+  .bar {
+    flex: 1;
+    height: 10px;
+    background: #e5e5e5;
+    border-radius: 5px;
+    position: relative;
+    border: 1px solid #ccc;
+  }
+  .bar-fill {
+    position: absolute; left: 0; top: 0;
+    height: 100%;
+    background: #2563eb;
+    border-radius: 4px;
+    transition: width .3s ease;
+  }
+  .bar-num {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1d4ed8;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .hint { color: #e5e5e5; font-size: 15px; margin-top: 20px; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Научные руководители</h1>
+
+  <div class="tabs">
+    <button type="button" class="tab {% if tab != 'browse' %}active{% endif %}" data-tab="search">Поиск по теме</button>
+    <button type="button" class="tab {% if tab == 'browse' %}active{% endif %}" data-tab="browse">Выбор преподавателя</button>
+  </div>
+
+  <div id="panel-search" class="panel {% if tab != 'browse' %}active{% endif %}">
+    <input class="search" type="text" id="query" value="{{ query }}"
+           placeholder="введи тему: машинное обучение, базы данных..." autocomplete="off">
+    <div class="list" id="results">
+      {% if query and not search_results %}
+      <p class="hint">ничего не найдено</p>
+      {% endif %}
+      {% for a in search_results %}
+      <div class="item">
+        <div class="name">{{ a.name }}</div>
+        <div class="meta">
+          <span>{{ a.in_topic }} работ по теме</span>
+          <span>основная: {{ a.main_topic }}</span>
+          <span>{{ a.total }} всего</span>
+        </div>
+        {% if a.matches %}
+        <ul class="matches">
+          {% for w in a.matches %}
+          <li>{{ w }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="bar-row">
+          <div class="bar"><div class="bar-fill" style="width:{{ a.rating }}%"></div></div>
+          <div class="bar-num">{{ a.rating }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div id="panel-browse" class="panel {% if tab == 'browse' %}active{% endif %}">
+    <select class="select-advisor" id="advisor-select">
+      <option value="">— выбери преподавателя —</option>
+      {% for name in advisors %}
+      <option value="{{ name }}" {% if name == selected_advisor %}selected{% endif %}>{{ name }}</option>
+      {% endfor %}
+    </select>
+    <div class="list" id="advisor-card">
+      {% if advisor_profile %}
+      <div class="item">
+        <div class="name">{{ advisor_profile.name }}</div>
+        <div class="meta">
+          <span>{{ advisor_profile.total }} дипломных работ</span>
+          <span>основная тема: {{ advisor_profile.main_topic }}</span>
+        </div>
+        <ul class="works-full">
+          {% for w in advisor_profile.works %}
+          <li>
+            {{ w.title }}
+            <span class="work-cat">{{ w.category }}{% if w.year %} · {{ w.year }}{% endif %}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+const tabs = document.querySelectorAll('.tab');
+const panels = {
+  search: document.getElementById('panel-search'),
+  browse: document.getElementById('panel-browse'),
+};
+const input = document.getElementById('query');
+const list = document.getElementById('results');
+const advisorSelect = document.getElementById('advisor-select');
+const advisorCard = document.getElementById('advisor-card');
+let timer = null;
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function setTab(name) {
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  Object.entries(panels).forEach(([k, el]) => el.classList.toggle('active', k === name));
+  const url = new URL(location.href);
+  url.searchParams.set('tab', name);
+  if (name === 'search') url.searchParams.delete('advisor');
+  history.replaceState(null, '', url);
+}
+
+tabs.forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
+
+function row(a) {
+  const matches = (a.matches || []).map(w => `<li>${esc(w)}</li>`).join('');
+  return `
+    <div class="item">
+      <div class="name">${esc(a.name)}</div>
+      <div class="meta">
+        <span>${a.in_topic} работ по теме</span>
+        <span>основная: ${esc(a.main_topic)}</span>
+        <span>${a.total} всего</span>
+      </div>
+      ${matches ? `<ul class="matches">${matches}</ul>` : ''}
+      <div class="bar-row">
+        <div class="bar"><div class="bar-fill" style="width:${a.rating}%"></div></div>
+        <div class="bar-num">${a.rating}</div>
+      </div>
+    </div>`;
+}
+
+async function doSearch(q) {
+  const url = new URL(location.href);
+  url.searchParams.set('tab', 'search');
+  if (q.trim()) url.searchParams.set('q', q);
+  else url.searchParams.delete('q');
+  url.searchParams.delete('advisor');
+  history.replaceState(null, '', url);
+
+  if (!q.trim()) { list.innerHTML = ''; return; }
+  const res = await fetch('/search?q=' + encodeURIComponent(q));
+  const data = await res.json();
+  if (!data.length) {
+    list.innerHTML = '<p class="hint">ничего не найдено</p>';
+    return;
+  }
+  list.innerHTML = data.map(row).join('');
+}
+
+function renderAdvisor(p) {
+  const works = p.works.map(w => `
+    <li>${esc(w.title)}
+      <span class="work-cat">${esc(w.category)}${w.year ? ' · ' + w.year : ''}</span>
+    </li>`).join('');
+  return `
+    <div class="item">
+      <div class="name">${esc(p.name)}</div>
+      <div class="meta">
+        <span>${p.total} дипломных работ</span>
+        <span>основная тема: ${esc(p.main_topic)}</span>
+      </div>
+      <ul class="works-full">${works}</ul>
+    </div>`;
+}
+
+async function loadAdvisor(name) {
+  const url = new URL(location.href);
+  url.searchParams.set('tab', 'browse');
+  if (name) url.searchParams.set('advisor', name);
+  else url.searchParams.delete('advisor');
+  url.searchParams.delete('q');
+  history.replaceState(null, '', url);
+
+  if (!name) { advisorCard.innerHTML = ''; return; }
+  const res = await fetch('/advisor?name=' + encodeURIComponent(name));
+  if (!res.ok) {
+    advisorCard.innerHTML = '<p class="hint">не найден</p>';
+    return;
+  }
+  advisorCard.innerHTML = renderAdvisor(await res.json());
+}
+
+input.addEventListener('input', function() {
+  clearTimeout(timer);
+  timer = setTimeout(() => doSearch(this.value), 250);
+});
+
+advisorSelect.addEventListener('change', function() {
+  loadAdvisor(this.value);
+});
+</script>
+</body>
+</html>

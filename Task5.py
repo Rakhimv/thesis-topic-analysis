@@ -6,6 +6,8 @@ data = pd.read_excel("thesis_data.xlsx")
 data = apply_categories(data)
 data["Department"] = data["Department"].apply(expand_department_name)
 pivot = pd.crosstab(data["Department"], data["category"])
+pivot['Total'] = pivot.sum(axis=1)
+
 
 fig = px.imshow(pivot, title="Связь кафедр и тематик", aspect="auto", color_continuous_scale="Blues")
 fig.show()
