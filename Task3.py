@@ -77,6 +77,9 @@ os.makedirs("category_wordclouds_by_advisor", exist_ok=True) # Создаём п
 data['Advisor'] = data['Advisor'].astype(str).str.strip() # Преобразуем в строку и чистим пробелы
 data['Advisor_mapped'] = data['Advisor'].map(teacher_eng_mapping).fillna(data['Advisor'])#Заменяем псевдонимы на ФИО 
 
+faculty_filter = data['Faculty'] == 'Процессы управления'
+data = data[faculty_filter]
+
 for advisor in data['Advisor_mapped'].unique(): # Цикл по уникальным
     if advisor == 'nan' or advisor == '': 
         continue
