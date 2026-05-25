@@ -1,10 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from categories import teacher_eng_mapping
+
 data = pd.read_excel("thesis_data.xlsx")
 
 data['Advisor'] = data['Advisor'].astype(str).str.strip() #берём колонки, на строки бъём, удаляем пробелы
-data['Advisor_clean'] = data['Advisor'].replace(['nan', 'None', ''], pd.NA) #создаём колонку, которая заменяет пустые на NA(нет данных)
+data['Advisor_mapped'] = data['Advisor'].map(teacher_eng_mapping).fillna(data['Advisor'])
+data['Advisor_mapped'] = data['Advisor_mapped'].replace(['nan', 'None', ''], pd.NA) # Колонка, где пустые заменены на флаг NA 
 
 advisor_counts = data['Advisor_clean'].value_counts().dropna() #считаем и удаляем с маркером NA
 
