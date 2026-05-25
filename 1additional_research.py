@@ -9,7 +9,7 @@ data['Advisor'] = data['Advisor'].astype(str).str.strip() #берём колон
 data['Advisor_mapped'] = data['Advisor'].map(teacher_eng_mapping).fillna(data['Advisor'])
 data['Advisor_mapped'] = data['Advisor_mapped'].replace(['nan', 'None', ''], pd.NA) # Колонка, где пустые заменены на флаг NA 
 
-advisor_counts = data['Advisor_clean'].value_counts().dropna() #считаем и удаляем с маркером NA
+advisor_counts = data['Advisor_mapped'].value_counts().dropna() #считаем и удаляем с маркером NA
 
 top_10 = advisor_counts.head(10) #берём первые 10 
 
