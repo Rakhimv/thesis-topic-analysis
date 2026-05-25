@@ -7,6 +7,9 @@ from categories import get_category
 
 data["category"] = data["Title_ru"].apply(get_category)# Получаем категории
 
+faculty_filter = data['Faculty'] == 'Процессы управления'
+data = data[faculty_filter]
+
 yearly_categories = data.groupby(["Graduation", "category"]).size().unstack(fill_value=0) # группируем строки по году и тематики, считаем, и разворачиваем в таблицу
 
 fig, ax = plt.subplots(figsize=(14, 8))

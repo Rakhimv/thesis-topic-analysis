@@ -6,6 +6,9 @@ import plotly.express as px
 data = pd.read_excel("thesis_data.xlsx")
 data = apply_categories(data)
 
+faculty_filter = data['Faculty'] == 'Процессы управления'
+data = data[faculty_filter]
+
 data["Advisor"] = data["Advisor"].astype(str).str.strip()
 data["Advisor_mapped"] = data["Advisor"].map(teacher_eng_mapping).fillna(data["Advisor"])
 

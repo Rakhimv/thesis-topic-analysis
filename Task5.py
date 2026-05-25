@@ -4,6 +4,10 @@ import plotly.express as px
 
 data = pd.read_excel("thesis_data.xlsx")
 data = apply_categories(data)
+
+faculty_filter = data['Faculty'] == 'Процессы управления'
+data = data[faculty_filter]
+
 data["Department"] = data["Department"].apply(expand_department_name)
 pivot = pd.crosstab(data["Department"], data["category"])
 pivot['Total'] = pivot.sum(axis=1)

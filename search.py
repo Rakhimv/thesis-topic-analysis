@@ -8,6 +8,10 @@ STOP_WORDS = {
 
 df = pd.read_excel("thesis_data.xlsx")
 df = apply_categories(df)
+
+faculty_filter = df['Faculty'] == 'Процессы управления' 
+df = df[faculty_filter]                                 
+
 df["Advisor"] = df["Advisor"].astype(str).str.strip()
 df["Advisor"] = df["Advisor"].map(teacher_eng_mapping).fillna(df["Advisor"])
 df = df[~df["Advisor"].isin(["nan", "None", ""])]

@@ -7,6 +7,10 @@ from categories import expand_department_name, department_mapping, speciality_ma
 
 data = pd.read_excel("thesis_data.xlsx")
 data = apply_categories(data)
+
+faculty_filter = data['Faculty'] == 'Процессы управления'
+data = data[faculty_filter]
+
 total = data["category"].value_counts().reset_index()
 total.columns = ["category", "count"]
 total = total.sort_values("count", ascending=True)

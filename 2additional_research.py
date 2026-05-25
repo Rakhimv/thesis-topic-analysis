@@ -10,6 +10,9 @@ data = apply_categories(data)
 data["Advisor"] = data["Advisor"].astype(str).str.strip()
 data["Advisor_mapped"] = data["Advisor"].map(teacher_eng_mapping).fillna(data["Advisor"])
 
+faculty_filter = data['Faculty'] == 'Процессы управления'
+data = data[faculty_filter]
+
 pivot = pd.crosstab(data["Advisor_mapped"], data["category"])
 
 main_topic = pivot.idxmax(axis=1)
