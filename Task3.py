@@ -8,7 +8,7 @@ import os
 data = pd.read_excel("thesis_data.xlsx")
 
 # Импортируем функции
-from categories import get_category, expand_department_name, department_mapping, speciality_mapping
+from categories import get_category, department_mapping, speciality_mapping, teacher_eng_mapping
 
 # Пытаемся найти совпадения из словаря (оставлено для совместимости)
 def normalize_speciality(spec): 
@@ -75,12 +75,13 @@ for department in data['Department_Full'].dropna().unique(): # Удаляем п
 os.makedirs("category_wordclouds_by_advisor", exist_ok=True) # Создаём папку
 
 data['Advisor'] = data['Advisor'].astype(str).str.strip() # Преобразуем в строку и чистим пробелы
+data['Advisor_mapped'] = data['Advisor'].map(teacher_eng_mapping).fillna(data['Advisor'])#Заменяем псевдонимы на ФИО 
 
-for advisor in data['Advisor'].unique(): # Цикл по уникальным
+for advisor in data['Advisor_mapped'].unique(): # Цикл по уникальным
     if advisor == 'nan' or advisor == '': 
         continue
     
-    adv_data = data[data['Advisor'] == advisor] # Создаём для конкретного руководителя
+    adv_data = data[data['Advisor_mapped'] == advisor] # Создаём для конкретного руководителя
     
     # Исключаем "Прочее" из подсчёта
     adv_data_filtered = adv_data[adv_data['Category'] != "Прочее"]

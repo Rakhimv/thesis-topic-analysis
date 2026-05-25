@@ -1,5 +1,5 @@
 import pandas as pd
-from categories import apply_categories, get_category, categories
+from categories import apply_categories, get_category, categories,teacher_eng_mapping
 
 STOP_WORDS = {
     "для", "на", "по", "в", "с", "и", "к", "о", "из",
@@ -9,6 +9,7 @@ STOP_WORDS = {
 df = pd.read_excel("thesis_data.xlsx")
 df = apply_categories(df)
 df["Advisor"] = df["Advisor"].astype(str).str.strip()
+df["Advisor"] = df["Advisor"].map(teacher_eng_mapping).fillna(df["Advisor"])
 df = df[~df["Advisor"].isin(["nan", "None", ""])]
 
 CROSSTAB = pd.crosstab(df["Advisor"], df["category"])
